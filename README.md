@@ -18,7 +18,7 @@ katrologger --output /path/file
 ```
 Send data by e-mail:
 ```
-keylogger --smtp-help
+katrologger --smtp-help
 ```
 - **Fixing problems accessing via SSH**
 > when connecting to the victim remotely via ssh it will be necessary to export environment variables to run the keylogger.
