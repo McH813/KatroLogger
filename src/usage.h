@@ -13,10 +13,6 @@ int flag_kill;
 int flag_smtp;
 int flag_status;
 int smtp_status;
-int smtp_help;
-int flags;
-int opt;
-void smtp_helper();
 extern char outfile[100];
 
 #endif

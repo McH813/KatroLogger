@@ -4,12 +4,10 @@ int max = 10;
 char proc[24] = {"/proc/"};
 FILE *read_path_logs;
 
-void check_status(){
+void check_status() {
 
 if( (access(check_file_pid, F_OK)) == 0 ) {
-
-    get_pid = fopen(check_file_pid, "r");
-
+  get_pid = fopen(check_file_pid, "r");
     if(get_pid == NULL){
         printf("Error");
       exit(1);
@@ -21,13 +19,11 @@ if( (access(check_file_pid, F_OK)) == 0 ) {
             flag_running = 1;
             closedir(dir);
             buffer_smtp = malloc(max);
-
             if( (access(smtp_file, F_OK)) == 0 ){
-              strncpy(buffer_smtp, "Enabled", 10);
+              strncpy(buffer_smtp, "enabled", 10);
             } else {
-              strncpy(buffer_smtp, "Disabled", 10);
+              strncpy(buffer_smtp, "disabled", 10);
             }
-
           } else if (ENOENT == errno) {
               flag_running = 0;
               closedir(dir);
@@ -75,23 +71,6 @@ void print_path_logs(){
           i++;
       }
       fclose(read_path_logs);
-      for (size_t j = i < 6 ? 0 : i - 6; j < i; j++) {
-          fputs(lines[j % 6], stdout);
-      }
-  }
-}
-
-void print_smtp_logs(){
-  size_t i = 0;
-  char lines[6][256];
-  FILE *read_smtp_logs = fopen("/var/log/curl_smtp.log", "r");
-
-  if (read_smtp_logs != NULL) {
-      while (fgets(lines[i % 6], sizeof(lines[i % 6]), read_smtp_logs) != NULL)
-      {
-          i++;
-      }
-      fclose(read_smtp_logs);
       for (size_t j = i < 6 ? 0 : i - 6; j < i; j++) {
           fputs(lines[j % 6], stdout);
       }

