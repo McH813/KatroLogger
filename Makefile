@@ -1,6 +1,8 @@
 # Executable
 EXEC=katrologger
 BIN=/usr/bin/
+CONFIG=/root/.katrologger/
+SYSTEMD=/etc/systemd/system/katrologger.service
 
 # Compiler
 CC=gcc
@@ -15,9 +17,8 @@ H_SRC=$(wildcard ./src/*.h)
 OBJ=$(subst .c,.o,$(subst src,objs,$(C_SRC)))
 
 # Flags
-CC_FLAGS=-w         \
-         -lX11      \
-         -lquickmail
+CC_FLAGS=-w          \
+         -lquickmail \
 
 all: objFolder $(EXEC)
 
@@ -52,3 +53,8 @@ make install:
 
 uninstall:
 	@ rm -f $(BIN)$(EXEC)
+	@ echo "remove binary --> $(BIN)$(EXEC)"
+	@ rm -rf $(CONFIG)
+	@ echo "remove directory --> $(CONFIG)"
+	@ rm -f $(SYSTEMD)
+	@ echo "remove systemd unif-file --> $(SYSTEMD)"

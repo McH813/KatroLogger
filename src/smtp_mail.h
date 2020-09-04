@@ -8,7 +8,7 @@
 #include <quickmail.h>
 
 void smtp_mail(int argc, char **argv);
-extern char outfile[100];
+extern char outfile[200];
 extern const char *cron_file;
 extern const char *smtp_log;
 

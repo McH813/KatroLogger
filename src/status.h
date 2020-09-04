@@ -14,6 +14,7 @@ void check_status();
 void read_path();
 void read_time();
 void read_size();
+void read_boot();
 void print_path_logs();
 void print_smtp_logs();
 
@@ -24,6 +25,7 @@ extern FILE *readpath;
 extern FILE *readtime;
 extern FILE *filesize;
 extern FILE *readsize;
+extern FILE *readboot;
 
 extern char buffer_pid[32];
 extern char *buffer_smtp;
@@ -34,11 +36,13 @@ extern const char *path_conf;
 extern const char *time_conf;
 extern const char *size_conf;
 extern const char *smtp_file;
+extern const char *boot_conf;
 
-extern char outfile[100];
+extern char outfile[200];
 
-char buffer_path[100];
-char buffer_time[100];
-char buffer_size[24];
+extern char buffer_path[100];
+extern char buffer_time[100];
+extern char buffer_size[24];
+extern char buffer_boot[24];
 
 #endif

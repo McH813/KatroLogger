@@ -1,5 +1,10 @@
 #include "status.h"
 
+char buffer_path[100];
+char buffer_time[100];
+char buffer_size[24];
+char buffer_boot[24];
+
 int max = 10;
 char proc[24] = {"/proc/"};
 FILE *read_path_logs;
@@ -42,6 +47,11 @@ void read_path(){
 void read_time(){
   readtime = fopen(time_conf, "r");
   fgets(buffer_time, sizeof(buffer_time), readtime);
+}
+
+void read_boot() {
+  readboot = fopen(boot_conf, "r");
+  fgets(buffer_boot, sizeof(buffer_boot), readboot);
 }
 
 void read_size(){

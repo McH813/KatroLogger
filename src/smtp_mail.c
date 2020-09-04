@@ -41,6 +41,12 @@ void smtp_mail(int argc, char **argv){
       } else if ( (strcmp(argv[arg], "--smtp-file") ) == 0) {
           arg++;
           strcpy(outfile, argv[arg]);
+          FILE *path_smtpfile = fopen(outfile, "a");
+          if (path_smtpfile == NULL)
+          {
+            printf("katrologger: Specified path does not exist: %s\nkatrologger: try 'katrologger --help'\n", outfile);
+            exit(1);
+          }
       } else if ( (strcmp(argv[arg], "--time") ) == 0) {
           arg++;
             if ( (atoi(argv[arg]) >= 1) && (atoi(argv[arg]) <= 60) ) {
@@ -90,7 +96,7 @@ fprintf(append_smtp_file, "Time intervall: %s minutes\n", time);
 fprintf(append_smtp_file, "Cronjob: yes\n");
 fclose(append_smtp_file);
 
-FILE *mail_job = fopen("/root/.katrologger/mailjob.c" ,"w");
+FILE *mail_job = fopen("/root/.katrologger/run/mailjob.c" ,"w");
 fprintf(mail_job, "#include <quickmail.h>\n");
 fprintf(mail_job, "int main(){\n");
 fprintf(mail_job, "quickmail_initialize();\n");
@@ -100,10 +106,10 @@ fprintf(mail_job, "quickmail_add_attachment_file(mailobj, \"%s\", NULL);\n", out
 fprintf(mail_job, "%s(mailobj, \"%s\", %d, \"%s\", \"%s\");\n", send_smtp, smtp_url, port, mail_from, mail_pass);
 fprintf(mail_job, "quickmail_destroy(mailobj);\n}\n");
 fclose(mail_job);
-system("gcc /root/.katrologger/mailjob.c -o /root/.katrologger/mailjob -lquickmail -w");
+system("gcc /root/.katrologger/run/mailjob.c -o /root/.katrologger/run/mailjob -lquickmail -w");
 
 if( (fd_cron_file = fopen(cron_file, "w") ) != NULL) {
-    snprintf(smtp_buffer, sizeof(smtp_buffer), "*/%s * * * * /root/.katrologger/mailjob\n", time);
+    snprintf(smtp_buffer, sizeof(smtp_buffer), "*/%s * * * * /root/.katrologger/run/mailjob\n", time);
     fprintf(fd_cron_file, smtp_buffer);
     fclose(fd_cron_file);
     chown(cron_file, 0, 108);

@@ -9,10 +9,12 @@
 #include <stdbool.h>
 
 int keylogger_usage(int argc, char **argv);
-int flag_kill;
-int flag_smtp;
-int flag_status;
-int smtp_status;
-extern char outfile[100];
+extern int flag_kill;
+extern int flag_smtp;
+extern int flag_status;
+extern int smtp_status;
+extern int no_bootable;
+extern int no_daemon;
+extern char outfile[200];
 
 #endif
